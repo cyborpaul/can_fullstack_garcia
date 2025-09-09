@@ -1,0 +1,135 @@
+services:
+  react:
+    container_name: f21_react
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./solution/frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE=http://localhost:9010
+    command: sh -lc "corepack enable || true; if [ -f pnpm-lock.yaml ]; then pnpm install; pnpm dev --host 0.0.0.0 --port 3000; else npm install; npm run dev -- --host 0.0.0.0 --port 3000; fi"
+    ports:
+      - "9999:3000"
+    networks:
+      - f21_network
+    depends_on:
+      - api
+
+  api:
+    container_name: f21_api
+    build:
+      context: ./solution/api
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - DB_CONN=Host=f21_postgres;Database=f1_database;Username=f1_sgcan;Password=f1_sgcan123456
+      - BROKER_URL=amqp://administrador:Password2025Canito@rabbitmq:5672
+      - QUEUE_EXTRACT=sgcan.documents.extract
+      - JWT_SECRET=fadkfnakjdnfjKNJKDNJFS_fs_f4f__fw_fwfw_Fwf_wDJABVJDVKETVSDVKLZnnn
+      - JWT_ISSUER=sgcan-api
+      - JWT_AUDIENCE=sgcan-client
+    ports:
+      - "9010:5000"
+    networks:
+      - f21_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U f1_sgcan -d f1_database -h localhost || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+
+  scraper:
+    container_name: f21_scraper
+    build:
+      context: ./solution/worker
+      dockerfile: Dockerfile
+    env_file:
+      - ./solution/worker/.env
+    environment:
+      - DB_CONN=postgresql://f1_sgcan:f1_sgcan123456@f21_postgres:5432/f1_database
+      - BROKER_URL=amqp://administrador:Password2025Canito@rabbitmq:5672
+      - QUEUE_EXTRACT=sgcan.documents.extract
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+      - MAIL_FROM=notifier@sgcan.local
+    depends_on:
+      - postgres
+      - rabbitmq
+      - mailhog
+    networks:
+      - f21_network
+
+  postgres:
+    image: postgres:16
+    container_name: f21_postgres
+    hostname: f21_postgres
+    environment:
+      POSTGRES_DB: f1_database
+      POSTGRES_USER: f1_sgcan
+      POSTGRES_PASSWORD: f1_sgcan123456
+    ports:
+      - "9040:5432"        # host:container
+    volumes:
+      - ./volumes/postgres_data:/var/lib/postgresql/data
+    networks:
+      - f21_network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U f1_sgcan -d f1_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    restart: always
+
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: f21_redis
+    hostname: f21_redis
+    ports:
+      - "9050:6379"
+    networks:
+      - f21_network
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: administrador
+      RABBITMQ_DEFAULT_PASS: Password2025Canito
+    ports:
+      - "5672:5672"  
+      - "15672:15672"    
+    volumes:
+      - ./volumes/rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - f21_network
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    container_name: f21_mailhog
+    image: mailhog/mailhog:latest
+    restart: always
+    ports:
+      - "1025:1025"    # SMTP
+      - "9025:8025"    # UI http://localhost:9025
+    networks:
+      - f21_network
+
+networks:
+  f21_network:
+    name: f21_network
+    driver: bridge

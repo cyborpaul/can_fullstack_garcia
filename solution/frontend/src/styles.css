@@ -1,0 +1,15 @@
+:root {
+  color-scheme: light;
+  --bg: #fff;
+  --fg: #111;
+  --muted: #eee;
+  --ok-bg: #e7f8ef;  --ok-fg: #0a7a3c;
+  --err-bg: #fdecec; --err-fg: #b50000;
+  font-family: ui-sans-serif, system-ui, Arial;
+}
+.container { max-width: 960px; margin: 24px auto; padding: 0 16px }
+.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+.table { width:100%; border-collapse: collapse; margin-top:12px }
+.table th,.table td{ border-bottom:1px solid #eee; padding:8px; vertical-align:top }
+.ok{ background:#e7f8ef; color:#0a7a3c; padding:6px 8px; border-radius:8px; display:inline-block; margin-top:8px }
+.err{ background:#fdecec; color:#b50000; padding:6px 8px; border-radius:8px; display:inline-block; margin-top:8px }
