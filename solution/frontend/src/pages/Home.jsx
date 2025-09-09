@@ -46,7 +46,7 @@ export default function Homey() {
   return (
     <div className="container" style={{ maxWidth: 960, margin: "24px auto", padding: "0 16px" }}>
       <div className="row" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:8 }}>
-        <h2>Homey</h2>
+        <h2>Home</h2>
         <div style={{ display:"flex", gap:8 }}>
           <label style={{ border:"1px solid #ddd", padding:"8px 12px", borderRadius:8, cursor:"pointer" }}>
             Subir CSV
