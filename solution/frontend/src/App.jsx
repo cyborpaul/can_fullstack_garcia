@@ -14,8 +14,10 @@ export default function App() {
     <Routes>
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginLazy />} />
+      <Route path="/register" element={<RegisterLazy />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/home" element={<HomeLazy />} />
+        <Route path="/files/:id" element={<FileDetailLazy/>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -25,3 +27,5 @@ export default function App() {
 import React from "react";
 const LoginLazy = React.lazy(() => import("./pages/Login.jsx"));
 const HomeLazy  = React.lazy(() => import("./pages/Home.jsx"));
+const FileDetailLazy  = React.lazy(() => import("./pages/DetalleArchivo.jsx"));
+const RegisterLazy  = React.lazy(() => import("./pages/Register.jsx"));

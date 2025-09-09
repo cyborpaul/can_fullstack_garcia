@@ -73,6 +73,7 @@ export default function Homey() {
             <th style={{ textAlign:"left", borderBottom:"1px solid #eee", padding:8 }}>Procesados</th>
             <th style={{ textAlign:"left", borderBottom:"1px solid #eee", padding:8 }}>Errores</th>
             <th style={{ textAlign:"left", borderBottom:"1px solid #eee", padding:8 }}>Estado</th>
+            <th style={{ textAlign:"left", borderBottom:"1px solid #eee", padding:8 }}>Detalle</th> {/* 👈 nueva col */}
           </tr>
         </thead>
         <tbody>
@@ -84,10 +85,18 @@ export default function Homey() {
               <td style={{ borderBottom:"1px solid #eee", padding:8 }}>{f.processed_count}</td>
               <td style={{ borderBottom:"1px solid #eee", padding:8 }}>{f.error_count}</td>
               <td style={{ borderBottom:"1px solid #eee", padding:8 }}>{f.status}</td>
+              <td style={{ borderBottom:"1px solid #eee", padding:8 }}>
+                <button
+                  onClick={() => window.open(`/files/${f.id}`, "_blank")}
+                  style={{ padding:"4px 8px", borderRadius:6, border:"1px solid #ddd", cursor:"pointer" }}
+                >
+                  Ver links
+                </button>
+              </td>
             </tr>
           ))}
           {!files.length && (
-            <tr><td colSpan={6} style={{ padding:12, color:"#777" }}>Sin archivos aún.</td></tr>
+            <tr><td colSpan={7} style={{ padding:12, color:"#777" }}>Sin archivos aún.</td></tr>
           )}
         </tbody>
       </table>
